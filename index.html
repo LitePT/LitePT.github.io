@@ -1,0 +1,978 @@
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LitePT: Lighter Yet Stronger Point Transformer</title>
+    <meta name="description" content="We've presented Clarity, a minimalist and elegant website template for AI research.">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <meta name="robots" content="all">
+    <meta content="en_EN" property="og:locale">
+    <meta content="website" property="og:type">
+    <meta content="https://shikun.io/projects/clarity" property="og:url">
+    <meta content="Clarity" property="og:title">
+    <meta content="Website Template for AI Research" property="og:description">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@your_twitter_id">
+    <meta name="twitter:description" content="LitePT: Lighter Yet Stronger Point Transformer">
+    <meta name="twitter:image:src" content="assets/figures/clarity.png">
+    
+    <link rel="stylesheet" type="text/css" media="all" href="assets/stylesheets/main_free.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="clarity/clarity.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/foundation.min.css">
+    <link href="assets/fontawesome-free-6.6.0-web/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/styles.css"/>
+
+    <!-- <link rel="stylesheet" href="./assets/stylesheets/bulma.min.css"> -->
+    <!-- =========== JS =========== -->
+    <script src="./assets/scripts/jquery.min.js"></script>
+    <script src="./assets/scripts/jquery.event.move.min.js"></script>
+    <script src="./assets/scripts/slick.min.js"></script>
+
+    <style>
+        .logo-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            column-gap: 5%;     /* gap between logo items in % */
+            margin-top: 5%;     /* responsive top margin */
+            width: 100%;
+        }
+
+        .logo-item {
+            flex: 0 0 20%;       /* each item is 20% of the row width */
+            display: flex;
+            align-items: center;
+            gap: 4%;             /* space between superscript and logo */
+        }
+
+        .logo-item img {
+            width: 100%;         /* fill the logo-item */
+            height: auto;        /* keep aspect ratio */
+            display: block;
+        }
+
+
+
+        /* thumbnail bar */
+        .thumbs{
+        margin-top:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap
+        }
+        .thumb{
+        position:relative;
+        border:2px solid #ccc;
+        border-radius:4px;
+        overflow:hidden;
+        cursor:pointer;
+        transition:.2s;
+        }
+        .thumb.active{border-color:#ff6600;opacity:1}
+        .thumb:hover  img{opacity:1}
+
+        .thumb img{
+        width:110px;height:70px;object-fit:cover;display:block;opacity:.85;
+        transition:.2s;
+        }
+
+        .thumb .cap{
+        position:absolute;left:0;right:0;bottom:0;
+        background:rgba(0,0,0,.55);
+        color:#fff;font-size:.7rem;line-height:1.3;
+        text-align:center;padding:2px 0;
+        pointer-events:none;          
+        }
+    </style>
+
+    <script defer src="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/index.js"></script>
+    <script src="assets/scripts/navbar.js"></script>  <!-- Comment to remove table of content. -->
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            "HTML-CSS": {
+              scale: 95,
+              fonts: ["Gyre-Pagella"],
+              imageFont: null,
+              undefinedFamily: "'Arial Unicode MS', cmbright"
+            },
+            tex2jax: {
+                inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+                processEscapes: true
+              }
+          });
+    </script>
+    <script type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <!-- Title Page -->
+    <!-- Dark Theme Example: Change the background colour dark and change the following div "blog-title" into "blog-title white". -->
+    <div class="container blog extra-extra-large" id="first-content" style="background-color: #e4e4e4;">
+        <!-- If you don't have a project cover: Change "blog-title" into "blog-title no-cover"  -->
+        <div class="blog-title no-cover">
+            <div class="blog-intro">
+                <div>
+                    <h1 class="title"><b>LitePT: Lighter Yet Stronger Point Transformer</b></h1>
+                    <br>
+                    <p class="author">
+                        <a href="https://ywyue.github.io/">Yuanwen Yue</a> <sup>1,2</sup>,  
+                        <a href="https://drprojects.github.io/">Damien Robert</a> <sup>3</sup>, 
+                        <a href="https://jytime.github.io/">Jianyuan Wang</a> <sup>2</sup>,  
+                        <a href="https://sunghwanhong.github.io/">Sunghwan Hong</a> <sup>1</sup>,  
+                        <a href="https://dm3l.uzh.ch/wegner">Jan Dirk Wegner</a> <sup>3</sup><br>
+                        <a href="https://chrirupp.github.io/">Christian Rupprecht</a> <sup>2</sup>,  
+                        <a href="https://igp.ethz.ch/personen/person-detail.html?persid=143986">Konrad Schindler</a> <sup>1</sup>
+                    </p>
+                    <!-- <p class="author" style="padding-top: 0px;"> -->
+                        <!-- <sup>1</sup> ETH Zurich,
+                        <sup>2</sup> University of Oxford,
+                        <sup>3</sup> University of Zurich -->
+                        <!-- <div class="columns-3">
+                        <img src="assets/figures/ethlogo.png" style="width: 100%">
+                        <img src="assets/figures/ethlogo.png" style="width: 100%">
+                        <img src="assets/figures/ethlogo.png" style="width: 100%">
+                        </div> -->
+                    <!-- </p> -->
+
+                    <div class="logo-row">
+                    <div class="logo-item">
+                        <sup>1</sup>
+                        <img src="assets/figures/ETH_logo.svg" alt="Logo 1">
+                    </div>
+
+                    <div class="logo-item">
+                        <sup>2</sup>
+                        <img src="assets/figures/oxford_logo.svg" alt="Logo 2">
+                    </div>
+
+                    <div class="logo-item">
+                        <sup>3</sup>
+                        <img src="assets/figures/uzh_logo.svg" alt="Logo 3">
+                    </div>
+                    </div>
+                    <br>
+                    <!-- <p class="abstract">
+                        Welcome to Clarity — an open-source, minimalist website template designed for presenting AI research. Originally developed as the foundation for my personal website, Clarity offers a modular, clean design that is easy to customise for simple, project-based website creation. With Clarity, you can effectively showcase your work, ensuring your research stands out in a visually appealing and professional manner. 
+                    </p> -->
+                    <!-- Using FontAwesome Pro -->
+                    <!-- <div class="info">
+                        <div>
+                            <a href="https://arxiv.org" class="button icon" style="background-color: rgba(255, 255, 255, 0.3)"> Paper <i class="far fa-book-open"></i></a> &nbsp;&nbsp; 
+                            <a href="https://github.com" class="button icon" style="background-color: rgba(255, 255, 255, 0.3)">Code <i class="far fa-code"></i></a>  &nbsp;&nbsp; 
+                            <a href="https://www.microsoft.com/en-gb/microsoft-365/powerpoint" class="button icon" style="background-color: rgba(255, 255, 255, 0.3);">Slides <i class="far fa-presentation"></i></a>  &nbsp;&nbsp; 
+                            <a href="https://huggingface.co/spaces" class="button icon" style="background-color: rgba(255, 255, 255, 0.3)">Demo <i class="fa-light fa-face-smiling-hands"></i></a>
+                        </div>
+                    </div> -->
+
+                    <!-- Using FontAwesome Free -->
+                    <div class="info">
+                        <div>
+                            <a href="https://arxiv.org" class="button icon" style="background-color: rgba(255, 255, 255, 0.5)"> Paper <i class="fa-solid fa-book-open"></i></a> &nbsp;&nbsp; 
+                            <a href="https://github.com" class="button icon" style="background-color: rgba(255, 255, 255, 0.5)">Code <i class="fa-solid fa-code"></i></a>  &nbsp;&nbsp; 
+                            <!-- <a href="https://www.microsoft.com/en-gb/microsoft-365/powerpoint" class="button icon" style="background-color: rgba(255, 255, 255, 0.2);">Slides <i class="fa-regular fa-file-powerpoint"></i></a> &nbsp;&nbsp; 
+                            <a href="https://huggingface.co/spaces/" class="button icon" style="background-color: rgba(255, 255, 255, 0.2)">Demo <i class="fa-solid fa-laptop-code"></i></a>  -->
+                        </div>
+                    </div>
+                </div>
+               
+                <!-- <div class="info">
+                    <p>CVPR 2048 / Best Paper Award</p>
+                </div> -->
+            </div>
+
+            <!-- <div class="blog-cover">
+                <img class="foreground" src="assets/figures/clarity.png">
+                <img class="background" src="assets/figures/clarity.png">
+            </div> -->
+        </div>
+    </div>
+
+
+    <div class="container blog main first" id="blog-main">
+        <h1 >
+            Introduction
+        </h1>
+        <p class="abstract" style="text-align: justify;">
+        <b>LitePT</b> is a lightweight, high-performance 3D point cloud architecture for various point cloud processing tasks. 
+        It embodies the simple principle <b>"convolutions for low-level geometry, attention for high-level relations"</b> and 
+        strategically places only the required operations at each hierarchy level, avoiding wasted computations.
+        We equip LitePT with parameter-free <b>PointROPE positional encoding</b> to compensate for the loss of spatial layout information that occurs when discarding convolutional layers.
+        Together, these integrated designs give rise to a state-of-the-art backbone for point cloud analysis.
+        </p>
+    </div>
+
+
+    <div class="container blog extra-large gray-linear">
+<div class="columns-2" style="display:flex; gap:20px;">
+    <div style="display:flex; flex-direction:column; flex:1;">
+        <h2 style="text-align:center;">Lighter 🚀</h2>
+        <img src="assets/figures/teaser_inference.png"
+             style="width:100%; height:500px; object-fit:contain;">
+        <p class="caption" style="text-align: justify;">
+            LitePT-S has $3.6\times$ fewer parameters, $2\times$ faster runtime and $2\times$ lower memory footprint than PTv3.
+            It remains faster and more memory-efficient than PTv3 even when scaled up to 86M parameters (LitePT-L).
+        </p>
+    </div>
+
+    <div style="display:flex; flex-direction:column; flex:1;">
+        <h2 style="text-align:center;">Stronger 💪</h2>
+        <img src="assets/figures/teaser_spider2.png"
+             style="width:100%; height:500px; object-fit:contain;">
+        <p class="caption" style="text-align: justify;">
+            Already the smallest variant, LitePT-S, matches or outperforms state-of-the-art point cloud backbones 
+            across a range of benchmarks.
+        </p>
+    </div>
+</div>
+
+    </div>
+
+    <div class="container blog main">
+        <h1>Convolution vs. Attention? 🤔 </h1>
+        <p class="text" style="text-align: justify;">
+            An often overlooked, yet important fact is that $67\%$ of the total parameter budget in PTv3 is spent on the sparse convolution layers of the positional encoding, while the Transformer part (i.e., attention and MLP) only accounts for $30\%$ of the learnable parameters.
+            Our starting point is the question: which distinct roles and impacts different operators have along the processing hierarchy?
+
+            We analyze the parameter and latency treemap of PTv3 in the following. We also show a comparison with our LitePT side-by-side.
+        </p>
+        <p style="font-size:1em; font-weight:600;">🔍 Observation 1: The cost of different operators depends heavily along the hierarchy</p>
+        <p class="text" style="text-align: justify;">
+            Convolution occpuies the majority of the parameter count of PTv3. The parameter count of the sparse convolution layers increases substantially with depth and is largest near the bottleneck, due to the high feature dimension of the late encoder and early decoder stages.
+            Attention, with its quadratic computational complexity, accounts for the majority of the computational cost. 
+            Importantly, that cost decreases as one progresses towards deeper stages near the bottleneck, because hierarchical downsampling quadratically reduces the number of point tokens.
+        </p>
+    </div>
+
+    <div class="container blog extra-large gray-linear">
+        <img src="assets/figures/treemap_parameters.png" style="width: 100%;">
+        <p class="caption" style="text-align: center;">
+                (a) Breakdown of trainable parameters
+        </p>
+        <!-- <img src="assets/figures/treemap_latencies.png" style="width: 100%;"> -->
+        <img src="assets/figures/treemap.svg" style="width: 100%;">
+        <p class="caption" style="text-align: center;">
+                (b) Breakdown of latencies
+        </p>
+    </div>
+
+
+    <div class="container blog main">
+
+        <p style="font-size:1em; font-weight:600;">🔍 Observation 2: U-Net structure learns operator-agnostic feature hierarchy</p>
+        <p class="text" style="text-align: justify;">
+To separate the contributions of the two modules, we design two reduced variants of the PTv3 block. In the first one, we remove the attention modules.
+Using exclusively this variant degenerates to a classical sparse U-Net structure.
+In the second variant, we remove only the sparse convolution layer to obtain a "pure" Transformer.
+\Cref{tab:deconstruction} contrasts the semantic segmentation performance of the two variants for ScanNet and NuScenes.
+It turns out that removing convolutions causes a larger performance drop than removing the attention modules, suggesting that the "positional encoding" actually does much of the heavy lifting.
+        </p>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead class="center">
+                        <tr>
+                            <th>Model</th>
+                            <th >#Params</th>
+                            <th>ScanNet mIoU</th>
+                            <th>NuScenes mIoU</th>
+                        </tr>
+                    </thead>
+                    <tbody class="center">
+                        <tr>
+                            <td>PTv3</td>
+                            <td>46.1M</td>
+                            <td>77.5</td>
+                            <td>80.4</td>
+                        </tr>
+                        <tr>
+                            <td>PTv3 w/o Transformer</td>
+                            <td>32.4M</td>
+                            <td>73.4</td>
+                            <td>76.1</td>
+                        </tr>
+                        <tr>
+                            <td>PTv3 w/o SPConv</td>
+                            <td>15.4M</td>
+                            <td>70.7</td>
+                            <td>74.9</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        
+
+                    <p class="text" style="text-align: justify;">
+
+We visualise the learnt embeddings at each encoding stage for the three variants using PCA and find that a distinct division of labour emerges along the hierarchy, regardless of whether convolution, attention, or both are used. 
+Early stages primarily encode local geometry, later stages capture high-level semantics.
+
+        </p>
+
+    </div>
+
+    <div class="container blog extra-large gray-linear">
+        <img src="assets/figures/pca_mapv2.png" style="width: 70%;">
+    </div>
+
+    <div class="container blog main">
+    <p class="text">
+        The above analysis leads us to the following hypotheses:
+    </p>
+
+    <ol>
+        <li>
+            <p class="text" style="text-align: justify;">It may not be necessary to use both convolution <em>and</em> attention at every stage. In the early stages, which prioritise local feature extraction, convolution is adequate. In deep stages, where the focus is on long-range context and semantic concepts, attention is key. </p>
+        </li>
+        <li>
+            <p class="text" style="text-align: justify;">It would be a sweet spot in terms of efficiency if one could indeed avoid attention at early stages, where it is most expensive, and convolution at late stages, where it inflates the parameter count.
+            </p>
+        </li>
+        <li>
+            <p class="text" style="text-align: justify;">Pure attention blocks will require an alternative positional encoding---but storing spatial layout is apparently <em>not</em> the main function of the convolution, so a more parameter-efficient replacement should be possible.
+            </p>
+        </li>
+    </ol>
+
+    </div>
+
+
+    <div class="container blog main">
+        <h1>Tailored Blocks for Different Network Stages 💡</h1>
+        <p class="text">
+            Driven by the insights from the study described above, we propose a simple yet effective design that retains only the essential operations in each stage. Convolutions are allocated to earlier stages with high spatial resolution and low channel depth, and attention is reserved for deep stages with only few, but high-dimensional tokens.
+        </p>
+    </div>
+
+    <div class="container blog extra-large gray-linear">
+        <img src="assets/figures/pipeline.png" style="width: 70%;">
+        <p class="caption" style="text-align: center;">
+        Our model comprises five stages, employing convolution blocks in the early stages and Point-ROPE augmented attention blocks in the later ones. LitePT-S uses a lightweight decoder. Alternatively, adding convolution or attention blocks symmetrically in the decoder produces LitePT-S*.
+        </p>
+    </div>
+
+    <div class="container blog main">
+        <h1>Point Rotary Positional Embedding 🪢</h1>
+        <p class="text" style="text-align: justify;">
+        Discarding the expensive convolution layer at deep hierarchy levels has an undesired side effect: one loses the positional encoding. Hence, a more parameter-efficient replacement is needed.
+        We adapt RoPE to 3D in a straightforward manner to obtain Point Rotary Positional Embedding (Point-ROPE). Given a point feature vector $\mathbf{f}_i \in \mathbb{R}^d$ at position $\mathbf{p}_i = (x_i,y_i,z_i)$, we divide the embedding dimension $d$ into three equal subspaces corresponding to the $x$, $y$, and $z$ axes:
+        \begin{equation}
+    \mathbf{f}_i =  [\mathbf{f}^{x}_i; \mathbf{f}^{y}_i; \mathbf{f}^{z}_i], \ \ \ \ \ \mathbf{f}^{x}_i, \mathbf{f}^{y}_i, \mathbf{f}^{z}_i \in  \mathbb{R}^{d/3}\;.
+\end{equation}
+We then independently apply the standard 1D RoPE embedding to each subspace, using the respective point coordinate, and concatenate the axis-wise embeddings to form the final point representation:
+\begin{equation}
+    \tilde{\mathbf{f}_i} =
+    \begin{bmatrix}
+    \tilde{\mathbf{f}^{x}_i} \\
+    \tilde{\mathbf{f}^{y}_i} \\
+    \tilde{\mathbf{f}^{z}_i}
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        \text{RoPE}_{1D}(\mathbf{f}^{x}_i, x_i) \\
+        \text{RoPE}_{1D}(\mathbf{f}^{y}_i, y_i) \\
+        \text{RoPE}_{1D}(\mathbf{f}^{z}_i, z_i)
+    \end{bmatrix}\;.
+\end{equation}
+For each point with coordinates $(x_i,y_i,z_i)$, we directly use its grid coordinates as input, which are already correctly scaled during the pooling operation.
+Compared to the learned convolutional positional encoding of PTv3, Point-ROPE is <b>parameter-free</b>, <b>lightweight</b>, and, by construction, <b>rotation-friendly</b>.
+        </p>
+    </div>
+
+    <div class="container blog extra-large gray-linear">
+        <img src="assets/figures/pointrope.png" style="width: 30%;">
+        <p class="caption" style="text-align: center;">
+        In the Point-ROPE attention module, input point features are projected to query (Q), key (K), and value (V) representations. PointROPE is then applied to Q and K, leaving V unchanged. The resulting "rotated" $\text{Q}'$ and $\text{K}'$ are fed into a standard scaled dot-product multi-head attention together with V, followed by a linear projection that produces the final output embeddings. Our PointROPE implementation is compatible with FlashAttention.
+        </p>
+    </div>
+
+    <div class="container blog main">
+        <h1>Attention Is Not All You Need, Convolution Neither</h1>
+        <p class="text" style="text-align: justify;">
+        To justify our design principle, we conduct two sets of experiments on NuScenes. We begin with a baseline model that incorporates both convolution and PointROPE attention at all stages. In Experiment 1, we progressively remove  <em>attention</em>, first from stage 0, then from stages 0 and 1, etc. In Experiment 2, we progressively remove <em>convolution</em>, first from stage 4, then from stages 4 and 3, etc. We then plot the mIoU of those configurations against latency (resp. parameter count).
+        <br>
+As shown in the figure below (left), removing attention in early stages boosts efficiency with almost no drop in mIoU, whereas removing attention in later stages harms performance. On the other hand, the right figure shows that removing convolution in later stages greatly reduces the parameter count with a negligible change in mIoU, whereas removing convolution in early stages only marginally improves efficiency but adversely affects performance.
+The analysis confirms that one needs  <em>not</em> include both convolution and attention at every stage. Their contribution and their cost highly depend on the hierarchy level.
+        </p>
+    </div>
+
+    
+    <div class="container blog extra-large gray-linear">
+        <div class="columns-2">
+        <div>
+        <img src="assets/figures/drop_attention.png" style="width: 60%;">
+        <p class="caption" style="text-align: center;">
+        Progressively dropping attention in more of the early stages. 
+        </p>
+        </div>
+        <div>
+        <img src="assets/figures/drop_conv.png" style="width: 60%;">
+        <p class="caption" style="text-align: center;">
+        Progressively dropping convolution in more of the late stages.
+        </p>
+        </div>
+    </div>
+    </div>
+
+    <div class="container blog main">
+        <h1>Qualitative Results</h1>
+    </div>
+    <div class="container blog extra-large">
+    <style>
+      .pc-wrap
+      {display:flex;gap:10px}
+      .pc-wrap canvas{
+        width:100%;
+        aspect-ratio: 1 / 1; /* makes it square */
+        background:#fff !important;
+        border:1px solid #cccbcb;
+        display:block;        
+        box-sizing: border-box;
+      }
+      .panel{position:relative;flex:1;    
+        overflow:hidden;}
+      .panel .label{position:absolute;left:8px;top:6px;background:#0008;color:#fff;
+                    font-size:.75rem;padding:2px 6px;border-radius:4px;user-select:none}
+    </style>
+
+    <!-- ======================== DATASET NuScenes ======================== -->
+    <h2>NuScenes:</h2>
+    <div class="pc-wrap">
+      <div class="panel">
+        <div class="label">Input</div><canvas id="A1"></canvas>
+      </div>
+      <div class="panel">
+        <div class="label">Prediction</div><canvas id="A2"></canvas>
+      </div>
+      <div class="panel">
+        <div class="label">GT</div><canvas id="A3"></canvas>
+      </div>
+    </div>
+
+    <div id="thumbA" class="thumbs">
+      <div class="thumb active"  data-scene="scene1">
+        <img src="assets/figures/thumbs/quali_nuscenes_sem_seg_1ccdbec944bd4994b91aa3d0af8d285c_input.jpg">
+      </div>
+
+      <div class="thumb" data-scene="scene2">
+        <img src="assets/figures/thumbs/quali_nuscenes_sem_seg_2f678cb1e67d42ae9a04401f9cc1e6be_input.jpg">
+      </div>
+
+      <div class="thumb" data-scene="scene3">
+        <img src="assets/figures/thumbs/quali_nuscenes_sem_seg_5f8393250fae4960b501cb6055614547_input.jpg"  >
+      </div>
+
+      <div class="thumb" data-scene="scene4">
+        <img src="assets/figures/thumbs/quali_nuscenes_sem_seg_6bfd64d0778842288608be82d7e36371_input.jpg">
+      </div>
+
+      <div class="thumb" data-scene="scene5">
+        <img src="assets/figures/thumbs/quali_nuscenes_sem_seg_8f78c446a68d4854bfb7cdfa1c7097d2_input.jpg">
+      </div>
+
+      <div class="thumb" data-scene="scene6">
+        <img src="assets/figures/thumbs/quali_nuscenes_sem_seg_049d115cb992491b8de81f45e9ecc803_input.jpg">
+      </div>
+    </div>
+
+    
+
+    <!-- ======================== DATASET Waymo ======================== -->
+    <h2>Waymo:</h2>
+    <div class="pc-wrap">
+      <div class="panel">
+        <div class="label">Input</div><canvas id="B1"></canvas>
+      </div>
+      <div class="panel">
+        <div class="label">Prediction</div><canvas id="B2"></canvas>
+      </div>
+      <div class="panel">
+        <div class="label">GT</div><canvas id="B3"></canvas>
+      </div>
+    </div>
+
+    <div id="thumbB" class="thumbs">
+      <div class="thumb active"  data-scene="scene1">
+        <img src="assets/figures/thumbs/quali_waymo_sem_seg_segment-3077229433993844199_1080_000_1100_000_with_camera_labels_1553271550525306_input.jpg">
+      </div>
+
+      <div class="thumb" data-scene="scene2">
+        <img src="assets/figures/thumbs/quali_waymo_sem_seg_segment-8956556778987472864_3404_790_3424_790_with_camera_labels_1513450837409246_input.jpg">
+      </div>
+
+      <div class="thumb" data-scene="scene3">
+        <img src="assets/figures/thumbs/quali_waymo_sem_seg_segment-9041488218266405018_6454_030_6474_030_with_camera_labels_1508979405218294_input.jpg"  >
+      </div>
+
+      <div class="thumb" data-scene="scene4">
+        <img src="assets/figures/thumbs/quali_waymo_sem_seg_segment-11037651371539287009_77_670_97_670_with_camera_labels_1507944303393935_input.jpg">
+      </div>
+
+      <div class="thumb" data-scene="scene5">
+        <img src="assets/figures/thumbs/quali_waymo_sem_seg_segment-18252111882875503115_378_471_398_471_with_camera_labels_1509125955575722_input.jpg">
+      </div>
+
+      <div class="thumb" data-scene="scene6">
+        <img src="assets/figures/thumbs/quali_waymo_sem_seg_segment-18333922070582247333_320_280_340_280_with_camera_labels_1507326323829964_input.jpg">
+      </div>
+    </div>
+
+
+    <!-- ======================== DATASET ScanNet ======================== -->
+    <h2>ScanNet:</h2>
+    <div class="pc-wrap">
+      <div class="panel">
+        <div class="label">Input</div><canvas id="C1"></canvas>
+      </div>
+      <div class="panel">
+        <div class="label">Prediction</div><canvas id="C2"></canvas>
+      </div>
+      <div class="panel">
+        <div class="label">GT</div><canvas id="C3"></canvas>
+      </div>
+    </div>
+
+    <div id="thumbC" class="thumbs">
+      <div class="thumb active"  data-scene="scene1">
+        <img src="assets/figures/thumbs/quali_scannet_sem_seg_scene0030_00_input.jpg">
+      </div>
+
+      <div class="thumb" data-scene="scene2">
+        <img src="assets/figures/thumbs/quali_scannet_sem_seg_scene0169_00_input.jpg">
+      </div>
+
+      <div class="thumb" data-scene="scene3">
+        <img src="assets/figures/thumbs/quali_scannet_sem_seg_scene0378_02_input.jpg"  >
+      </div>
+
+      <div class="thumb" data-scene="scene4">
+        <img src="assets/figures/thumbs/quali_scannet_sem_seg_scene0406_02_input.jpg">
+      </div>
+
+      <div class="thumb" data-scene="scene5">
+        <img src="assets/figures/thumbs/quali_scannet_sem_seg_scene0645_01_input.jpg">
+      </div>
+
+      <div class="thumb" data-scene="scene6">
+        <img src="assets/figures/thumbs/quali_scannet_sem_seg_scene0651_00_input.jpg">
+      </div>
+    </div>
+
+
+    <!-- ======================== DATASET Stru3D ======================== -->
+    <h2>Structured3D:</h2>
+    <div class="pc-wrap">
+      <div class="panel">
+        <div class="label">Input</div><canvas id="D1"></canvas>
+      </div>
+      <div class="panel">
+        <div class="label">Prediction</div><canvas id="D2"></canvas>
+      </div>
+      <div class="panel">
+        <div class="label">GT</div><canvas id="D3"></canvas>
+      </div>
+    </div>
+
+    <div id="thumbD" class="thumbs">
+      <div class="thumb active"  data-scene="scene1">
+        <img src="assets/figures/thumbs/quali_stru3d_sem_seg_scene_03022_room_8765_input.jpg">
+      </div>
+
+      <div class="thumb" data-scene="scene2">
+        <img src="assets/figures/thumbs/quali_stru3d_sem_seg_scene_03034_room_401_input.jpg">
+      </div>
+
+      <div class="thumb" data-scene="scene3">
+        <img src="assets/figures/thumbs/quali_stru3d_sem_seg_scene_03113_room_560_input.jpg"  >
+      </div>
+
+      <div class="thumb" data-scene="scene4">
+        <img src="assets/figures/thumbs/quali_stru3d_sem_seg_scene_03195_room_1764_input.jpg">
+      </div>
+
+      <div class="thumb" data-scene="scene5">
+        <img src="assets/figures/thumbs/quali_stru3d_sem_seg_scene_03223_room_4894_input.jpg">
+      </div>
+
+      <div class="thumb" data-scene="scene6">
+        <img src="assets/figures/thumbs/quali_stru3d_sem_seg_scene_03237_room_2846_input.jpg">
+      </div>
+    </div>
+
+    </div>
+
+    <p style="text-align:center;">For more results, please check out our paper and code. </p>
+
+
+    <div class="container blog main">
+        <h1>Citation</h1>
+        <pre><code class="plaintext">@article{yuelitept2025,
+            title={LitePT: Lighter Yet Stronger Point Transformer},
+            author={Yue, Yuanwen and Robert, Damien and Wang, Jianyuan and Hong, Sunghwan and Wegner, Jan Dirk and Rupprecht, Christian and Schindler, Konrad},
+            journal={arxiv},
+            year={2025}
+        }</code></pre>
+    </div>
+
+    <div class="container blog main">
+        <h1>Acknowledgments</h1>
+        <p class="text">
+            The project is partially supported by the Circular Bio-based Europe Joint Undertaking and its members under grant agreement No 101157488. Part of the compute is supported by Swiss AI supercomputer Alps under project a144.
+        </p>
+    </div>
+
+    <!-- Footer Page -->
+    <footer>
+        <div class="container">
+            <p>
+                The style of the website is based on the <a href="https://shikun.io/projects/clarity">Clarity Template</a>.
+            </p>
+        </div>    
+    </footer>
+    
+
+
+
+
+<script type="importmap">
+  {
+    "imports": {
+      "three": "./assets/scripts/three.module.js"
+    }
+  }
+</script>
+<script type="module">
+import * as THREE from "./assets/scripts/three.module.js";
+import {PLYLoader} from "./assets/scripts/PLYLoader.js";
+import {OrbitControls} from "./assets/scripts/OrbitControls.js";
+
+
+
+const nuscenes_scenes = {
+  scene1:{
+    geo:{
+            input:"./assets/ply/nuscenes_sem_seg/1ccdbec944bd4994b91aa3d0af8d285c/1ccdbec944bd4994b91aa3d0af8d285c_input.ply", 
+            pred:"./assets/ply/nuscenes_sem_seg/1ccdbec944bd4994b91aa3d0af8d285c/1ccdbec944bd4994b91aa3d0af8d285c_pred.ply",
+            gt:"./assets/ply/nuscenes_sem_seg/1ccdbec944bd4994b91aa3d0af8d285c/1ccdbec944bd4994b91aa3d0af8d285c_gt.ply", 
+        }
+    },
+  scene2:{
+    geo:{
+            input:"./assets/ply/nuscenes_sem_seg/2f678cb1e67d42ae9a04401f9cc1e6be/2f678cb1e67d42ae9a04401f9cc1e6be_input.ply", 
+            pred:"./assets/ply/nuscenes_sem_seg/2f678cb1e67d42ae9a04401f9cc1e6be/2f678cb1e67d42ae9a04401f9cc1e6be_pred.ply",
+            gt:"./assets/ply/nuscenes_sem_seg/2f678cb1e67d42ae9a04401f9cc1e6be/2f678cb1e67d42ae9a04401f9cc1e6be_gt.ply", 
+        }
+    },
+  scene3:{
+    geo:{
+            input:"./assets/ply/nuscenes_sem_seg/5f8393250fae4960b501cb6055614547/5f8393250fae4960b501cb6055614547_input.ply", 
+            pred:"./assets/ply/nuscenes_sem_seg/5f8393250fae4960b501cb6055614547/5f8393250fae4960b501cb6055614547_pred.ply",
+            gt:"./assets/ply/nuscenes_sem_seg/5f8393250fae4960b501cb6055614547/5f8393250fae4960b501cb6055614547_gt.ply", 
+        }
+    },
+  scene4:{
+    geo:{
+            input:"./assets/ply/nuscenes_sem_seg/6bfd64d0778842288608be82d7e36371/6bfd64d0778842288608be82d7e36371_input.ply", 
+            pred:"./assets/ply/nuscenes_sem_seg/6bfd64d0778842288608be82d7e36371/6bfd64d0778842288608be82d7e36371_pred.ply",
+            gt:"./assets/ply/nuscenes_sem_seg/6bfd64d0778842288608be82d7e36371/6bfd64d0778842288608be82d7e36371_gt.ply", 
+        }
+    },
+  scene5:{
+    geo:{
+            input:"./assets/ply/nuscenes_sem_seg/8f78c446a68d4854bfb7cdfa1c7097d2/8f78c446a68d4854bfb7cdfa1c7097d2_input.ply", 
+            pred:"./assets/ply/nuscenes_sem_seg/8f78c446a68d4854bfb7cdfa1c7097d2/8f78c446a68d4854bfb7cdfa1c7097d2_pred.ply",
+            gt:"./assets/ply/nuscenes_sem_seg/8f78c446a68d4854bfb7cdfa1c7097d2/8f78c446a68d4854bfb7cdfa1c7097d2_gt.ply", 
+        }
+    },
+  scene6:{
+    geo:{
+            input:"./assets/ply/nuscenes_sem_seg/049d115cb992491b8de81f45e9ecc803/049d115cb992491b8de81f45e9ecc803_input.ply", 
+            pred:"./assets/ply/nuscenes_sem_seg/049d115cb992491b8de81f45e9ecc803/049d115cb992491b8de81f45e9ecc803_pred.ply",
+            gt:"./assets/ply/nuscenes_sem_seg/049d115cb992491b8de81f45e9ecc803/049d115cb992491b8de81f45e9ecc803_gt.ply", 
+        }
+    },
+
+};
+
+
+const waymo_scenes = {
+  scene1:{
+    geo:{
+            input:"./assets/ply/waymo_sem_seg/segment-3077229433993844199_1080_000_1100_000_with_camera_labels_1553271550525306/segment-3077229433993844199_1080_000_1100_000_with_camera_labels_1553271550525306_input.ply", 
+            pred:"./assets/ply/waymo_sem_seg/segment-3077229433993844199_1080_000_1100_000_with_camera_labels_1553271550525306/segment-3077229433993844199_1080_000_1100_000_with_camera_labels_1553271550525306_pred.ply",
+            gt:"./assets/ply/waymo_sem_seg/segment-3077229433993844199_1080_000_1100_000_with_camera_labels_1553271550525306/segment-3077229433993844199_1080_000_1100_000_with_camera_labels_1553271550525306_gt.ply", 
+        }
+    },
+  scene2:{
+    geo:{
+            input:"./assets/ply/waymo_sem_seg/segment-8956556778987472864_3404_790_3424_790_with_camera_labels_1513450837409246/segment-8956556778987472864_3404_790_3424_790_with_camera_labels_1513450837409246_input.ply", 
+            pred:"./assets/ply/waymo_sem_seg/segment-8956556778987472864_3404_790_3424_790_with_camera_labels_1513450837409246/segment-8956556778987472864_3404_790_3424_790_with_camera_labels_1513450837409246_pred.ply",
+            gt:"./assets/ply/waymo_sem_seg/segment-8956556778987472864_3404_790_3424_790_with_camera_labels_1513450837409246/segment-8956556778987472864_3404_790_3424_790_with_camera_labels_1513450837409246_gt.ply",  
+        }
+    },
+  scene3:{
+    geo:{
+            input:"./assets/ply/waymo_sem_seg/segment-9041488218266405018_6454_030_6474_030_with_camera_labels_1508979405218294/segment-9041488218266405018_6454_030_6474_030_with_camera_labels_1508979405218294_input.ply", 
+            pred:"./assets/ply/waymo_sem_seg/segment-9041488218266405018_6454_030_6474_030_with_camera_labels_1508979405218294/segment-9041488218266405018_6454_030_6474_030_with_camera_labels_1508979405218294_pred.ply",
+            gt:"./assets/ply/waymo_sem_seg/segment-9041488218266405018_6454_030_6474_030_with_camera_labels_1508979405218294/segment-9041488218266405018_6454_030_6474_030_with_camera_labels_1508979405218294_gt.ply", 
+        }
+    },
+  scene4:{
+    geo:{
+            input:"./assets/ply/waymo_sem_seg/segment-11037651371539287009_77_670_97_670_with_camera_labels_1507944303393935/segment-11037651371539287009_77_670_97_670_with_camera_labels_1507944303393935_input.ply", 
+            pred:"./assets/ply/waymo_sem_seg/segment-11037651371539287009_77_670_97_670_with_camera_labels_1507944303393935/segment-11037651371539287009_77_670_97_670_with_camera_labels_1507944303393935_pred.ply",
+            gt:"./assets/ply/waymo_sem_seg/segment-11037651371539287009_77_670_97_670_with_camera_labels_1507944303393935/segment-11037651371539287009_77_670_97_670_with_camera_labels_1507944303393935_gt.ply", 
+        }
+    },
+  scene5:{
+    geo:{
+            input:"./assets/ply/waymo_sem_seg/segment-18252111882875503115_378_471_398_471_with_camera_labels_1509125955575722/segment-18252111882875503115_378_471_398_471_with_camera_labels_1509125955575722_input.ply", 
+            pred:"./assets/ply/waymo_sem_seg/segment-18252111882875503115_378_471_398_471_with_camera_labels_1509125955575722/segment-18252111882875503115_378_471_398_471_with_camera_labels_1509125955575722_pred.ply",
+            gt:"./assets/ply/waymo_sem_seg/segment-18252111882875503115_378_471_398_471_with_camera_labels_1509125955575722/segment-18252111882875503115_378_471_398_471_with_camera_labels_1509125955575722_gt.ply", 
+        }
+    },
+  scene6:{
+    geo:{
+            input:"./assets/ply/waymo_sem_seg/segment-18333922070582247333_320_280_340_280_with_camera_labels_1507326323829964/segment-18333922070582247333_320_280_340_280_with_camera_labels_1507326323829964_input.ply", 
+            pred:"./assets/ply/waymo_sem_seg/segment-18333922070582247333_320_280_340_280_with_camera_labels_1507326323829964/segment-18333922070582247333_320_280_340_280_with_camera_labels_1507326323829964_pred.ply",
+            gt:"./assets/ply/waymo_sem_seg/segment-18333922070582247333_320_280_340_280_with_camera_labels_1507326323829964/segment-18333922070582247333_320_280_340_280_with_camera_labels_1507326323829964_gt.ply", 
+        }
+    },
+
+};
+
+const scannet_scenes = {
+  scene1:{
+    geo:{
+            input:"./assets/ply/scannet_sem_seg/scene0030_00/scene0030_00_input.ply", 
+            pred:"./assets/ply/scannet_sem_seg/scene0030_00/scene0030_00_pred.ply",
+            gt:"./assets/ply/scannet_sem_seg/scene0030_00/scene0030_00_gt.ply", 
+        }
+    },
+  scene2:{
+    geo:{
+            input:"./assets/ply/scannet_sem_seg/scene0169_00/scene0169_00_input.ply", 
+            pred:"./assets/ply/scannet_sem_seg/scene0169_00/scene0169_00_pred.ply",
+            gt:"./assets/ply/scannet_sem_seg/scene0169_00/scene0169_00_gt.ply", 
+        }
+    },
+  scene3:{
+    geo:{
+            input:"./assets/ply/scannet_sem_seg/scene0378_02/scene0378_02_input.ply", 
+            pred:"./assets/ply/scannet_sem_seg/scene0378_02/scene0378_02_pred.ply",
+            gt:"./assets/ply/scannet_sem_seg/scene0378_02/scene0378_02_gt.ply", 
+        }
+    },
+  scene4:{
+    geo:{
+            input:"./assets/ply/scannet_sem_seg/scene0406_02/scene0406_02_input.ply", 
+            pred:"./assets/ply/scannet_sem_seg/scene0406_02/scene0406_02_pred.ply",
+            gt:"./assets/ply/scannet_sem_seg/scene0406_02/scene0406_02_gt.ply", 
+        }
+    },
+  scene5:{
+    geo:{
+            input:"./assets/ply/scannet_sem_seg/scene0645_01/scene0645_01_input.ply", 
+            pred:"./assets/ply/scannet_sem_seg/scene0645_01/scene0645_01_pred.ply",
+            gt:"./assets/ply/scannet_sem_seg/scene0645_01/scene0645_01_gt.ply", 
+        }
+    },
+  scene6:{
+    geo:{
+            input:"./assets/ply/scannet_sem_seg/scene0651_00/scene0651_00_input.ply", 
+            pred:"./assets/ply/scannet_sem_seg/scene0651_00/scene0651_00_pred.ply",
+            gt:"./assets/ply/scannet_sem_seg/scene0651_00/scene0651_00_gt.ply", 
+        }
+    },
+
+};
+
+
+
+const stru3d_scenes = {
+  scene1:{
+    geo:{
+            input:"./assets/ply/stru3d_sem_seg/scene_03022_room_8765/scene_03022_room_8765_input.ply", 
+            pred:"./assets/ply/stru3d_sem_seg/scene_03022_room_8765/scene_03022_room_8765_pred.ply",
+            gt:"./assets/ply/stru3d_sem_seg/scene_03022_room_8765/scene_03022_room_8765_gt.ply", 
+        }
+    },
+  scene2:{
+    geo:{
+            input:"./assets/ply/stru3d_sem_seg/scene_03034_room_401/scene_03034_room_401_input.ply", 
+            pred:"./assets/ply/stru3d_sem_seg/scene_03034_room_401/scene_03034_room_401_pred.ply",
+            gt:"./assets/ply/stru3d_sem_seg/scene_03034_room_401/scene_03034_room_401_gt.ply", 
+        }
+    },
+  scene3:{
+    geo:{
+            input:"./assets/ply/stru3d_sem_seg/scene_03113_room_560/scene_03113_room_560_input.ply", 
+            pred:"./assets/ply/stru3d_sem_seg/scene_03113_room_560/scene_03113_room_560_pred.ply",
+            gt:"./assets/ply/stru3d_sem_seg/scene_03113_room_560/scene_03113_room_560_gt.ply", 
+        }
+    },
+  scene4:{
+    geo:{
+            input:"./assets/ply/stru3d_sem_seg/scene_03195_room_1764/scene_03195_room_1764_input.ply", 
+            pred:"./assets/ply/stru3d_sem_seg/scene_03195_room_1764/scene_03195_room_1764_pred.ply",
+            gt:"./assets/ply/stru3d_sem_seg/scene_03195_room_1764/scene_03195_room_1764_gt.ply", 
+        }
+    },
+  scene5:{
+    geo:{
+            input:"./assets/ply/stru3d_sem_seg/scene_03223_room_4894/scene_03223_room_4894_input.ply", 
+            pred:"./assets/ply/stru3d_sem_seg/scene_03223_room_4894/scene_03223_room_4894_pred.ply",
+            gt:"./assets/ply/stru3d_sem_seg/scene_03223_room_4894/scene_03223_room_4894_gt.ply", 
+        }
+    },
+  scene6:{
+    geo:{
+            input:"./assets/ply/stru3d_sem_seg/scene_03237_room_2846/scene_03237_room_2846_input.ply", 
+            pred:"./assets/ply/stru3d_sem_seg/scene_03237_room_2846/scene_03237_room_2846_pred.ply",
+            gt:"./assets/ply/stru3d_sem_seg/scene_03237_room_2846/scene_03237_room_2846_gt.ply", 
+        }
+    },
+
+};
+
+
+class TripleViewer {
+  constructor(canvasIds, scenes) {
+    this.sceneName = "scene1";
+    this.mode = "geo";
+    this.scenes = scenes;
+
+    this.cvs = canvasIds.map(id => document.getElementById(id));
+    this.scn = [];
+    this.cam = [];
+    this.ren = [];
+    this.ctrl = [];
+    this.loader = new PLYLoader();
+
+    this.initThree();
+    this.loadAll();
+    this.animate();
+  }
+
+  initThree() {
+    for (let i = 0; i < 3; i++) {
+      const cvs = this.cvs[i];
+
+      this.scn[i] = new THREE.Scene();
+
+      this.cam[i] = new THREE.PerspectiveCamera(
+        60,
+        cvs.clientWidth / cvs.clientHeight,
+        0.01,
+        1000
+      );
+      this.cam[i].up.set(0,0,1);
+      this.cam[i].position.set(0,-5,0);
+
+      this.ren[i] = new THREE.WebGLRenderer({
+        canvas: cvs,
+        antialias: false
+      });
+      this.ren[i].setSize(cvs.clientWidth, cvs.clientHeight);
+      this.ren[i].setClearColor(0xffffff, 1);
+
+      this.ctrl[i] = new OrbitControls(this.cam[i], cvs);
+      this.ctrl[i].enableDamping = true;
+      this.ctrl[i].dampingFactor = 0.15;
+      this.ctrl[i].rotateSpeed = 0.7;
+      this.ctrl[i].zoomSpeed = 0.9;
+
+      this.ctrl[i].addEventListener("change", () => this.sync(i));
+    }
+  }
+
+  sync(src) {
+    for (let i = 0; i < 3; i++) {
+      if (i === src) continue;
+      this.cam[i].position.copy(this.cam[src].position);
+      this.cam[i].quaternion.copy(this.cam[src].quaternion);
+      this.ctrl[i].target.copy(this.ctrl[src].target);
+    }
+  }
+
+  loadAll() {
+    ["input", "pred", "gt"].forEach((tag, idx) => {
+      const url = this.scenes[this.sceneName][this.mode][tag];
+
+      const scene = this.scn[idx];
+      scene.children.filter(o => o.isPoints).forEach(o => scene.remove(o));
+
+      this.loader.load(url, geo => {
+        geo.computeBoundingBox(); geo.center();
+        geo.computeBoundingSphere();
+        const R = geo.boundingSphere.radius;
+
+        const mat = geo.hasAttribute("color") ?
+          new THREE.PointsMaterial({ size: R*0.01, vertexColors: true }) :
+          new THREE.PointsMaterial({ size: R*0.01, color: 0xaaaaaa });
+
+        scene.add(new THREE.Points(geo, mat));
+
+        // this.cam[idx].position.set(0, -R*3, 0);
+        this.cam[idx].position.set(0, 0, R * 3);
+        this.cam[idx].lookAt(0, 0, 0);
+        this.ctrl[idx].target.set(0, 0, 0);
+        this.ctrl[idx].update();
+      });
+    });
+  }
+
+  setScene(name) {
+    this.sceneName = name;
+    this.loadAll();
+  }
+
+  setMode(mode) {
+    this.mode = mode;
+    this.loadAll();
+  }
+
+  animate() {
+    requestAnimationFrame(() => this.animate());
+    for (let i = 0; i < 3; i++) {
+      this.ren[i].render(this.scn[i], this.cam[i]);
+    }
+  }
+}
+
+const viewerA = new TripleViewer(["A1","A2","A3"], nuscenes_scenes);
+const viewerB = new TripleViewer(["B1","B2","B3"], waymo_scenes);
+const viewerC = new TripleViewer(["C1","C2","C3"], scannet_scenes);
+const viewerD = new TripleViewer(["D1","D2","D3"], stru3d_scenes);
+
+
+
+function bindThumbs(viewer, thumbContainerId) {
+  document.querySelectorAll(`#${thumbContainerId} .thumb`).forEach(t => {
+    t.onclick = () => {
+      document.querySelectorAll(`#${thumbContainerId} .thumb`)
+        .forEach(x => x.classList.remove("active"));
+
+      t.classList.add("active");
+
+      viewer.setScene(t.dataset.scene);
+    };
+  });
+}
+
+bindThumbs(viewerA, "thumbA");
+bindThumbs(viewerB, "thumbB");
+bindThumbs(viewerC, "thumbC");
+bindThumbs(viewerD, "thumbD");
+
+
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script src="clarity/clarity.js"></script>    
+    <script src="assets/scripts/main.js"></script>    
+    </html>
+</body>
