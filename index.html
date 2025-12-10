@@ -31,6 +31,9 @@
     <script src="./assets/scripts/slick.min.js"></script>
 
     <style>
+        .pt-block {
+            white-space: nowrap;    /* keeps "Point Transformer" on the same line */
+        }
         .logo-row {
             display: flex;
             justify-content: center;
@@ -91,6 +94,7 @@
           width: 100%;
           height: auto;
         }
+        }
     </style>
 
     <script defer src="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/index.js"></script>
@@ -123,14 +127,14 @@
         <div class="blog-title no-cover">
             <div class="blog-intro">
                 <div>
-                    <h1 class="title"><b>LitePT: Lighter Yet Stronger Point Transformer</b></h1>
+                    <h1 class="title" style="text-align: center;"><b>LitePT: Lighter Yet Stronger <span class="pt-block">Point Transformer</span></b></h1>
                     <br>
                     <p class="author" style="text-align: center;">
                         <a href="https://ywyue.github.io/">Yuanwen Yue</a> <sup>1,2</sup>,  
                         <a href="https://drprojects.github.io/">Damien Robert</a> <sup>3</sup>, 
                         <a href="https://jytime.github.io/">Jianyuan Wang</a> <sup>2</sup>,  
                         <a href="https://sunghwanhong.github.io/">Sunghwan Hong</a> <sup>1</sup>,  
-                        <a href="https://dm3l.uzh.ch/wegner">Jan Dirk Wegner</a> <sup>3</sup><br>
+                        <a href="https://dm3l.uzh.ch/wegner/group-leader">Jan Dirk Wegner</a> <sup>3</sup><br>
                         <a href="https://chrirupp.github.io/">Christian Rupprecht</a> <sup>2</sup>,  
                         <a href="https://igp.ethz.ch/personen/person-detail.html?persid=143986">Konrad Schindler</a> <sup>1</sup>
                     </p>
