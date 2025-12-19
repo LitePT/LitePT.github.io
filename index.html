@@ -220,7 +220,7 @@
         </p>
         <p style="font-size:1em; font-weight:600;">🔍 Observation 1: The cost of different operators depends heavily along the hierarchy</p>
         <p class="text" style="text-align: justify;">
-            Convolution occpuies the majority of the parameter count of PTv3. The parameter count of the sparse convolution layers increases substantially with depth and is largest near the bottleneck, due to the high feature dimension of the late encoder and early decoder stages.
+            Convolution occupies the majority of the parameter count of PTv3. The parameter count of the sparse convolution layers increases substantially with depth and is largest near the bottleneck, due to the high feature dimension of the late encoder and early decoder stages.
             Attention, with its quadratic computational complexity, accounts for the majority of the computational cost. 
             Importantly, that cost decreases as one progresses towards deeper stages near the bottleneck, because hierarchical downsampling quadratically reduces the number of point tokens.
         </p>
